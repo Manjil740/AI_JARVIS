@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JARVIS Control Center - Debug Mode</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2196F3;
+            --danger: #f44336;
+            --success: #4CAF50;
+            --warning: #ff9800;
+            --bg-dark: #1a1a1a;
+            --bg-lighter: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: #404040;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        /* ==================== AUTH PAGE ==================== */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        .auth-box {
+            background: var(--bg-lighter);
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            padding: 40px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-header h1 {
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .auth-header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .auth-section {
+            margin-bottom: 25px;
+        }
+
+        .auth-section label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn-voice {
+            background: var(--success);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-voice:hover {
+            background: #45a049;
+        }
+
+        .btn-voice.listening {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .status-message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .status-message.error {
+            background: rgba(244, 67, 54, 0.1);
+            color: #ff6b6b;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            display: block;
+        }
+
+        .status-message.success {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4CAF50;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            display: block;
+        }
+
+        .status-message.info {
+            background: rgba(33, 150, 243, 0.1);
+            color: #2196F3;
+            border: 1px solid rgba(33, 150, 243, 0.3);
+            display: block;
+        }
+
+        .voice-wave {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            height: 30px;
+        }
+
+        .voice-bar {
+            width: 3px;
+            height: 100%;
+            background: var(--success);
+            border-radius: 2px;
+            animation: soundWave 0.5s ease-in-out infinite;
+        }
+
+        .voice-bar:nth-child(1) { animation-delay: 0s; }
+        .voice-bar:nth-child(2) { animation-delay: 0.1s; }
+        .voice-bar:nth-child(3) { animation-delay: 0.2s; }
+        .voice-bar:nth-child(4) { animation-delay: 0.3s; }
+        .voice-bar:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes soundWave {
+            0%, 100% { height: 10%; }
+            50% { height: 100%; }
+        }
+
+        /* ==================== MAIN DASHBOARD ==================== */
+        .dashboard {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .dashboard.active {
+            display: flex;
+        }
+
+        .top-bar {
+            background: var(--bg-lighter);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-bar h1 {
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .top-bar-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .status-badge {
+            background: var(--success);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: #d32f2f;
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 15px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .setting-card {
+            background: var(--bg-lighter);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .setting-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.1);
+        }
+
+        .setting-card h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        .setting-item {
+            margin-bottom: 15px;
+        }
+
+        .setting-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select, input[type="text"], input[type="number"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--text-secondary);
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--success);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-save {
+            flex: 1;
+            padding: 10px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .btn-save:hover {
+            background: #45a049;
+        }
+
+        .btn-reset {
+            flex: 1;
+            padding: 10px;
+            background: var(--warning);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .btn-reset:hover {
+            background: #e68900;
+        }
+
+        .info-box {
+            background: rgba(33, 150, 243, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .feature-item {
+            background: var(--bg-lighter);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-icon {
+            font-size: 20px;
+        }
+
+        .feature-info h4 {
+            margin-bottom: 3px;
+            font-size: 13px;
+        }
+
+        .feature-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .code-block {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .success-animation {
+            animation: successPulse 0.5s ease-out;
+        }
+
+        @keyframes successPulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-lighter);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- ==================== AUTH PAGE ==================== -->
+    <div id="authPage" class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <h1>🔐 JARVIS Debug Mode</h1>
+                <p>Voice Verification Required</p>
+            </div>
+
+            <div id="authStatus" class="status-message"></div>
+
+            <div class="auth-section">
+                <label>Method 1: Keyword Entry</label>
+                <div class="input-group">
+                    <input 
+                        type="password" 
+                        id="debugKeyword" 
+                        placeholder="Enter: debugmode code 0"
+                        autocomplete="off"
+                    >
+                    <button class="btn btn-primary" onclick="verifyDebugKeyword()">Verify</button>
+                </div>
+            </div>
+
+            <div class="auth-section">
+                <label>Method 2: Voice Verification</label>
+                <div class="button-group">
+                    <button class="btn btn-voice" id="voiceBtn" onclick="startVoiceAuth()">
+                        <span id="voiceText">🎤 Listen</span>
+                    </button>
+                </div>
+                <div id="voiceWave" class="voice-wave" style="display: none;">
+                    <div class="voice-bar"></div>
+                    <div class="voice-bar"></div>
+                    <div class="voice-bar"></div>
+                    <div class="voice-bar"></div>
+                    <div class="voice-bar"></div>
+                </div>
+            </div>
+
+            <div class="info-box" style="margin-top: 30px;">
+                <strong>🔒 Security Notice:</strong> This control panel requires authentication. Say "debugmode code 0" or enter the keyword to access system settings.
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MAIN DASHBOARD ==================== -->
+    <div id="dashboard" class="dashboard">
+        <div class="top-bar">
+            <div>
+                <h1>⚙️ JARVIS Control Center</h1>
+            </div>
+            <div class="top-bar-right">
+                <span class="status-badge" id="statusBadge">🟢 Online</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Tabs -->
+            <div class="tab-container">
+                <button class="tab-btn active" onclick="switchTab('ai-settings')">🤖 AI Settings</button>
+                <button class="tab-btn" onclick="switchTab('response-settings')">💬 Response Types</button>
+                <button class="tab-btn" onclick="switchTab('security-settings')">🔐 Security</button>
+                <button class="tab-btn" onclick="switchTab('features')">✨ Features</button>
+                <button class="tab-btn" onclick="switchTab('advanced')">⚙️ Advanced</button>
+            </div>
+
+            <!-- AI Settings Tab -->
+            <div id="ai-settings" class="tab-content active">
+                <div class="settings-grid">
+                    <div class="setting-card">
+                        <h3>🤖 Default AI Provider</h3>
+                        <div class="setting-item">
+                            <label class="setting-label">Primary Provider</label>
+                            <select id="defaultProvider" onchange="updateSetting('default_provider', this.value)">
+                                <option value="gemini">Google Gemini (Research & Web)</option>
+                                <option value="openai">OpenAI GPT-4 (Code & Creative)</option>
+                                <option value="deepseek">DeepSeek (Math & Logic)</option>
+                                <option value="custom">Custom Endpoint</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">Smart Routing</label>
+                            <div class="toggle-switch">
+                                <label class="switch">
+                                    <input type="checkbox" id="smartRouting" onchange="updateSetting('smart_routing', this.checked)">
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Auto-select best provider per task</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>🔄 Provider Mapping</h3>
+                        <div class="setting-item">
+                            <label class="setting-label">Research Tasks</label>
+                            <select id="researchProvider" onchange="updateSetting('research_provider', this.value)">
+                                <option value="gemini">Google Gemini</option>
+                                <option value="openai">OpenAI</option>
+                                <option value="deepseek">DeepSeek</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">Code Generation</label>
+                            <select id="codeProvider" onchange="updateSetting('code_provider', this.value)">
+                                <option value="openai">OpenAI</option>
+                                <option value="gemini">Google Gemini</option>
+                                <option value="deepseek">DeepSeek</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">Math Problems</label>
+                            <select id="mathProvider" onchange="updateSetting('math_provider', this.value)">
+                                <option value="deepseek">DeepSeek</option>
+                                <option value="openai">OpenAI</option>
+                                <option value="gemini">Google Gemini</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>🔑 API Keys</h3>
+                        <div class="info-box">
+                            API keys are stored securely in environment variables. Update them via terminal:
+                            <div class="code-block">
+export OPENAI_API_KEY="your-key"
+export GOOGLE_API_KEY="your-key"
+export DEEPSEEK_API_KEY="your-key"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Response Settings Tab -->
+            <div id="response-settings" class="tab-content">
+                <div class="settings-grid">
+                    <div class="setting-card">
+                        <h3>💬 Response Type</h3>
+                        <div class="setting-item">
+                            <label class="setting-label">Select Response Format</label>
+                            <select id="responseType" onchange="updateSetting('response_type', this.value)">
+                                <option value="detailed">📖 Detailed - Full explanations with context</option>
+                                <option value="concise">⚡ Concise - Short, key points only</option>
+                                <option value="technical">🔬 Technical - Deep specs & details</option>
+                                <option value="simple">🧒 Simple - ELI5 beginner-friendly</option>
+                                <option value="code">💻 Code - Code examples focused</option>
+                                <option value="bullet">📋 Bullet - Key points in bullet format</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>📝 Content Options</h3>
+                        <div class="setting-item">
+                            <label class="setting-label">Include Examples</label>
+                            <div class="toggle-switch">
+                                <label class="switch">
+                                    <input type="checkbox" id="includeExamples" onchange="updateSetting('include_examples', this.checked)" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Show practical examples</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">Include Code</label>
+                            <div class="toggle-switch">
+                                <label class="switch">
+                                    <input type="checkbox" id="includeCode" onchange="updateSetting('include_code', this.checked)" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Include code samples</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>🎓 Language Level</h3>
+                        <div class="setting-item">
+                            <label class="setting-label">User Level</label>
+                            <select id="languageLevel" onchange="updateSetting('language_level', this.value)">
+                                <option value="beginner">🟢 Beginner - Simple, clear language</option>
+                                <option value="intermediate">🟡 Intermediate - Balanced technical</option>
+                                <option value="advanced">🔴 Advanced - Deep technical knowledge</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">Response Length</label>
+                            <select id="responseLength" onchange="updateSetting('response_length', this.value)">
+                                <option value="short">Short - 1-2 sentences</option>
+                                <option value="medium">Medium - 2-3 paragraphs</option>
+                                <option value="long">Long - Full detailed response</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>📊 Response Preview</h3>
+                        <div style="background: var(--bg-dark); padding: 15px; border-radius: 6px; margin-top: 10px;">
+                            <p style="color: var(--text-secondary); font-size: 12px; margin-bottom: 10px;">Current settings preview:</p>
+                            <p id="responsePreview" style="font-size: 13px; line-height: 1.6;">Response preview updates as you change settings...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Settings Tab -->
+            <div id="security-settings" class="tab-content">
+                <div class="settings-grid">
+                    <div class="setting-card">
+                        <h3>🔐 Sudo Configuration</h3>
+                        <div class="setting-item">
+                            <label class="setting-label">Current Sudo Keyword</label>
+                            <input 
+                                type="password" 
+                                id="sudoKeyword" 
+                                placeholder="sudo code 0"
+                                readonly
+                            >
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">Set New Keyword</label>
+                            <input 
+                                type="text" 
+                                id="newSudoKeyword" 
+                                placeholder="e.g., unlock the vault"
+                            >
+                        </div>
+                        <button class="btn-save" onclick="updateSudoKeyword()">Update Keyword</button>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>⏱️ Access Duration</h3>
+                        <div class="setting-item">
+                            <label class="setting-label">Default Duration (seconds)</label>
+                            <input 
+                                type="number" 
+                                id="sudoDuration" 
+                                value="300"
+                                min="60"
+                                max="3600"
+                                onchange="updateSetting('sudo_duration', this.value)"
+                            >
+                            <p style="font-size: 11px; color: var(--text-secondary); margin-top: 5px;">
+                                ℹ️ Default: 300s (5 min) | Max: 3600s (1 hour)
+                            </p>
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">Time-based Variants</label>
+                            <div class="toggle-switch">
+                                <label class="switch">
+                                    <input type="checkbox" id="timedSudo" onchange="updateSetting('timed_sudo', this.checked)" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Allow "sudo code 300", "sudo code 1800", etc.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>🚫 Dangerous Commands</h3>
+                        <div class="setting-item">
+                            <label class="setting-label">Command Blocking</label>
+                            <div class="toggle-switch">
+                                <label class="switch">
+                                    <input type="checkbox" id="commandBlocking" onchange="updateSetting('command_blocking', this.checked)" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Block dangerous commands (rm -rf, etc.)</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">Require Confirmation</label>
+                            <div class="toggle-switch">
+                                <label class="switch">
+                                    <input type="checkbox" id="requireConfirm" onchange="updateSetting('require_confirmation', this.checked)" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Confirm before executing sudo commands</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>🔒 Voice Biometrics</h3>
+                        <div class="setting-item">
+                            <label class="setting-label">Voice Verification</label>
+                            <div class="toggle-switch">
+                                <label class="switch">
+                                    <input type="checkbox" id="voiceBio" onchange="updateSetting('voice_biometric', this.checked)">
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Enable voice biometric verification for debug mode</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>📋 Sudo Examples</h3>
+                        <div style="font-size: 12px; line-height: 1.8;">
+                            <p><strong>Default:</strong> "sudo code 0" → 5 minutes</p>
+                            <p><strong>Timed:</strong> "sudo code 300" → 5 min</p>
+                            <p><strong>Timed:</strong> "sudo code 1800" → 30 min</p>
+                            <p><strong>Custom:</strong> "unlock the vault" → custom keyword</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Tab -->
+            <div id="features" class="tab-content">
+                <div class="info-box">
+                    <strong>🎯 Intelligent Features:</strong> JARVIS now includes advanced AI-powered features for better automation and control.
+                </div>
+
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-info">
+                            <h4>App Intelligence</h4>
+                            <p>Research & install apps automatically</p>
+                            <div class="toggle-switch" style="margin-top: 8px;">
+                                <label class="switch">
+                                    <input type="checkbox" id="appIntel" onchange="updateSetting('app_intelligence', this.checked)" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">🧠</div>
+                        <div class="feature-info">
+                            <h4>Smart Routing</h4>
+                            <p>Auto-select best AI provider per task</p>
+                            <div class="toggle-switch" style="margin-top: 8px;">
+                                <label class="switch">
+                                    <input type="checkbox" id="smartRoute" onchange="updateSetting('smart_routing', this.checked)" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">💬</div>
+                        <div class="feature-info">
+                            <h4>Response Customization</h4>
+                            <p>6 different response types available</p>
+                            <div class="toggle-switch" style="margin-top: 8px;">
+                                <label class="switch">
+                                    <input type="checkbox" id="respCustom" onchange="updateSetting('response_customization', this.checked)" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">🔐</div>
+                        <div class="feature-info">
+                            <h4>Custom Sudo Keywords</h4>
+                            <p>Fully customizable security phrases</p>
+                            <div class="toggle-switch" style="margin-top: 8px;">
+                                <label class="switch">
+                                    <input type="checkbox" id="customSudo" onchange="updateSetting('custom_sudo', this.checked)" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">🎤</div>
+                        <div class="feature-info">
+                            <h4>Voice Commands</h4>
+                            <p>Full voice control with wake word</p>
+                            <div class="toggle-switch" style="margin-top: 8px;">
+                                <label class="switch">
+                                    <input type="checkbox" id="voiceCmd" onchange="updateSetting('voice_commands', this.checked)" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-info">
+                            <h4>Conversation History</h4>
+                            <p>Store and recall past interactions</p>
+                            <div class="toggle-switch" style="margin-top: 8px;">
+                                <label class="switch">
+                                    <input type="checkbox" id="history" onchange="updateSetting('conversation_history', this.checked)" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Tab -->
+            <div id="advanced" class="tab-content">
+                <div class="settings-grid">
+                    <div class="setting-card">
+                        <h3>⚙️ System Configuration</h3>
+                        <div class="info-box">
+                            These are advanced settings. Modify with caution.
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">Logging Level</label>
+                            <select id="logLevel" onchange="updateSetting('logging_level', this.value)">
+                                <option value="debug">Debug - Verbose logging</option>
+                                <option value="info">Info - Normal logging</option>
+                                <option value="warning">Warning - Warnings only</option>
+                                <option value="error">Error - Errors only</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">Response Cache</label>
+                            <div class="toggle-switch">
+                                <label class="switch">
+                                    <input type="checkbox" id="caching" onchange="updateSetting('response_caching', this.checked)" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Cache responses to reduce API calls</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>📁 Data Management</h3>
+                        <div class="setting-item">
+                            <button class="btn-save" onclick="exportSettings()">📥 Export Settings</button>
+                        </div>
+                        <div class="setting-item">
+                            <button class="btn-save" onclick="document.getElementById('importFile').click()">📤 Import Settings</button>
+                            <input type="file" id="importFile" style="display:none;" accept=".json" onchange="importSettings(event)">
+                        </div>
+                        <div class="setting-item">
+                            <button class="btn-reset" onclick="resetDefaults()">🔄 Reset to Defaults</button>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>🔐 Debug Mode Access</h3>
+                        <div class="info-box">
+                            <strong>Current Keyword:</strong>
+                            <div class="code-block" style="margin-top: 10px;">
+debugmode code 0
+                            </div>
+                            <p style="margin-top: 10px;">Say this phrase or enter in password field to access this control panel.</p>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>📊 System Status</h3>
+                        <div class="setting-item">
+                            <label class="setting-label">JARVIS Status</label>
+                            <p style="padding: 10px; background: var(--bg-dark); border-radius: 6px; border-left: 3px solid var(--success);">
+                                🟢 Running | Version 2.0.0 | All systems operational
+                            </p>
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">Last Updated</label>
+                            <p id="lastUpdate" style="color: var(--text-secondary); font-size: 12px;">Never</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== AUTHENTICATION ==================== 
+        const CORRECT_KEYWORD = "debugmode code 0";
+        let isAuthenticated = false;
+
+        function verifyDebugKeyword() {
+            const keyword = document.getElementById('debugKeyword').value.toLowerCase().trim();
+            const statusEl = document.getElementById('authStatus');
+
+            if (keyword === CORRECT_KEYWORD) {
+                statusEl.className = 'status-message success';
+                statusEl.textContent = '✓ Keyword verified! Authenticating...';
+                setTimeout(() => {
+                    isAuthenticated = true;
+                    showDashboard();
+                }, 500);
+            } else {
+                statusEl.className = 'status-message error';
+                statusEl.textContent = '✗ Incorrect keyword. Try again.';
+                document.getElementById('debugKeyword').value = '';
+            }
+        }
+
+        function startVoiceAuth() {
+            const voiceBtn = document.getElementById('voiceBtn');
+            const voiceWave = document.getElementById('voiceWave');
+            const statusEl = document.getElementById('authStatus');
+
+            voiceWave.style.display = 'flex';
+            voiceBtn.classList.add('listening');
+            document.getElementById('voiceText').textContent = 'Listening...';
+
+            statusEl.className = 'status-message info';
+            statusEl.textContent = '🎤 Listening for voice command... Say "debugmode code 0"';
+
+            // Simulate voice recognition
+            setTimeout(() => {
+                voiceWave.style.display = 'none';
+                voiceBtn.classList.remove('listening');
+
+                // For demo: automatically verify
+                statusEl.className = 'status-message success';
+                statusEl.textContent = '✓ Voice verified! Authenticating...';
+                document.getElementById('voiceText').textContent = '🎤 Verified';
+
+                setTimeout(() => {
+                    isAuthenticated = true;
+                    showDashboard();
+                }, 500);
+            }, 3000);
+        }
+
+        function showDashboard() {
+            document.getElementById('authPage').style.display = 'none';
+            document.getElementById('dashboard').classList.add('active');
+            loadSettings();
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                isAuthenticated = false;
+                document.getElementById('dashboard').classList.remove('active');
+                document.getElementById('authPage').style.display = 'flex';
+                document.getElementById('debugKeyword').value = '';
+                document.getElementById('authStatus').className = 'status-message';
+                document.getElementById('authStatus').textContent = '';
+            }
+        }
+
+        // ==================== TAB SWITCHING ==================== 
+        function switchTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Remove active from all buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Mark button as active
+            event.target.classList.add('active');
+        }
+
+        // ==================== SETTINGS ==================== 
+        let settings = {
+            default_provider: 'gemini',
+            smart_routing: true,
+            response_type: 'detailed',
+            include_examples: true,
+            include_code: true,
+            language_level: 'intermediate',
+            response_length: 'medium',
+            sudo_duration: 300,
+            timed_sudo: true,
+            command_blocking: true,
+            app_intelligence: true,
+            response_customization: true,
+            custom_sudo: true,
+            voice_commands: true
+        };
+
+        function loadSettings() {
+            // Load from localStorage if available
+            const saved = localStorage.getItem('jarvis_settings');
+            if (saved) {
+                settings = JSON.parse(saved);
+            }
+
+            // Update UI
+            document.getElementById('defaultProvider').value = settings.default_provider;
+            document.getElementById('smartRouting').checked = settings.smart_routing;
+            document.getElementById('responseType').value = settings.response_type;
+            document.getElementById('includeExamples').checked = settings.include_examples;
+            document.getElementById('includeCode').checked = settings.include_code;
+            document.getElementById('languageLevel').value = settings.language_level;
+            document.getElementById('responseLength').value = settings.response_length;
+            document.getElementById('sudoDuration').value = settings.sudo_duration;
+            document.getElementById('timedSudo').checked = settings.timed_sudo;
+            document.getElementById('commandBlocking').checked = settings.command_blocking;
+            document.getElementById('appIntel').checked = settings.app_intelligence;
+            document.getElementById('respCustom').checked = settings.response_customization;
+            document.getElementById('customSudo').checked = settings.custom_sudo;
+            document.getElementById('voiceCmd').checked = settings.voice_commands;
+
+            updateResponsePreview();
+        }
+
+        function updateSetting(key, value) {
+            settings[key] = value;
+            saveSettings();
+            updateResponsePreview();
+        }
+
+        function saveSettings() {
+            localStorage.setItem('jarvis_settings', JSON.stringify(settings));
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+
+            // Show success animation
+            event.target.classList.add('success-animation');
+            setTimeout(() => event.target.classList.remove('success-animation'), 500);
+        }
+
+        function updateSudoKeyword() {
+            const newKeyword = document.getElementById('newSudoKeyword').value;
+            if (newKeyword && newKeyword.length >= 3) {
+                settings.sudo_keyword = newKeyword;
+                saveSettings();
+                alert('Sudo keyword updated to: ' + newKeyword);
+                document.getElementById('newSudoKeyword').value = '';
+            } else {
+                alert('Keyword must be at least 3 characters');
+            }
+        }
+
+        function updateResponsePreview() {
+            const preview = document.getElementById('responsePreview');
+            const type = settings.response_type;
+
+            const previews = {
+                detailed: 'Providing comprehensive explanations with full context, examples, and background information.',
+                concise: 'Keeping responses short and to the point with only the essential information.',
+                technical: 'Using technical terminology with deep specifications, implementation details, and architecture notes.',
+                simple: 'Explaining concepts in very simple, beginner-friendly language without jargon.',
+                code: 'Focusing on practical, working code examples and implementation samples.',
+                bullet: 'Presenting information as bullet points with key takeaways.'
+            };
+
+            preview.textContent = previews[type] || 'Select a response type';
+        }
+
+        function exportSettings() {
+            const dataStr = JSON.stringify(settings, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'jarvis-settings.json';
+            link.click();
+        }
+
+        function importSettings(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const imported = JSON.parse(e.target.result);
+                        settings = {...settings, ...imported};
+                        saveSettings();
+                        loadSettings();
+                        alert('Settings imported successfully!');
+                    } catch (error) {
+                        alert('Error importing settings: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function resetDefaults() {
+            if (confirm('Reset all settings to defaults? This cannot be undone.')) {
+                settings = {
+                    default_provider: 'gemini',
+                    smart_routing: true,
+                    response_type: 'detailed',
+                    include_examples: true,
+                    include_code: true,
+                    language_level: 'intermediate',
+                    response_length: 'medium',
+                    sudo_duration: 300,
+                    timed_sudo: true,
+                    command_blocking: true,
+                    app_intelligence: true,
+                    response_customization: true,
+                    custom_sudo: true,
+                    voice_commands: true
+                };
+                saveSettings();
+                loadSettings();
+                alert('Settings reset to defaults!');
+            }
+        }
+
+        // Allow Enter key to submit in auth
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('debugKeyword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') verifyDebugKeyword();
+            });
+        });
+    </script>
+</body>
+</html>

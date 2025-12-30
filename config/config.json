@@ -1,0 +1,154 @@
+{
+  "application": {
+    "name": "JARVIS Voice AI Assistant",
+    "version": "2.0.0",
+    "description": "Advanced voice-controlled AI assistant with intelligent features",
+    "author": "Your Name",
+    "license": "MIT"
+  },
+  "ai": {
+    "default_provider": "gemini",
+    "smart_routing": true,
+    "response_type": "detailed",
+    "response_format": "markdown",
+    "fallback_providers": ["openai", "deepseek"],
+    "provider_mapping": {
+      "research": "gemini",
+      "code": "openai",
+      "math": "deepseek",
+      "creative": "openai",
+      "factual": "gemini",
+      "system": "deepseek",
+      "default": "gemini"
+    },
+    "providers": {
+      "openai": {
+        "enabled": true,
+        "api_key_env": "OPENAI_API_KEY",
+        "model": "gpt-4o",
+        "tasks": ["code", "creative", "complex_reasoning"],
+        "temperature": 0.7
+      },
+      "deepseek": {
+        "enabled": true,
+        "api_key_env": "DEEPSEEK_API_KEY",
+        "model": "deepseek-chat",
+        "tasks": ["math", "logic", "system_commands", "security"],
+        "temperature": 0.5
+      },
+      "gemini": {
+        "enabled": true,
+        "api_key_env": "GOOGLE_API_KEY",
+        "model": "gemini-pro",
+        "tasks": ["research", "factual", "web_search", "general"],
+        "temperature": 0.7
+      }
+    }
+  },
+  "security": {
+    "sudo_keyword": "sudo code 0",
+    "sudo_mode_duration": 300,
+    "allow_custom_sudo": true,
+    "allow_timed_sudo": true,
+    "max_sudo_duration": 3600,
+    "voice_biometric_enabled": false,
+    "require_confirmation": true,
+    "dangerous_commands_blocked": true
+  },
+  "features": {
+    "voice_input": true,
+    "text_input": true,
+    "web_portal": true,
+    "app_intelligence": true,
+    "auto_research_apps": true,
+    "smart_routing": true,
+    "response_customization": true,
+    "conversation_history": true,
+    "response_caching": true,
+    "error_recovery": true,
+    "audit_logging": true
+  },
+  "response_customization": {
+    "enabled": true,
+    "type": "detailed",
+    "format": "text",
+    "length": "medium",
+    "include_examples": true,
+    "include_code": true,
+    "language_level": "intermediate"
+  },
+  "voice": {
+    "wake_word": "hello jarvis",
+    "wake_word_sensitivity": 0.5,
+    "speech_recognition_engine": "google",
+    "speech_recognition_language": "en-US",
+    "text_to_speech_engine": "pyttsx3",
+    "text_to_speech_voice": "default",
+    "text_to_speech_rate": 150,
+    "microphone_device": "default",
+    "speaker_device": "default",
+    "audio_sample_rate": 16000,
+    "audio_chunk_size": 2048,
+    "noise_threshold": 0.1,
+    "enable_subtitle_overlay": true
+  },
+  "logging": {
+    "level": "INFO",
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "file": "/var/log/jarvis/jarvis.log",
+    "max_bytes": 10485760,
+    "backup_count": 5,
+    "console_output": true
+  },
+  "performance": {
+    "response_cache_enabled": true,
+    "cache_ttl_seconds": 3600,
+    "conversation_history_limit": 100,
+    "max_concurrent_requests": 5,
+    "request_timeout_seconds": 30
+  },
+  "gui_automation": {
+    "enabled": true,
+    "mouse_speed": 1.0,
+    "click_duration": 0.1,
+    "type_speed": 0.05,
+    "screenshot_enabled": true
+  },
+  "system": {
+    "service_name": "jarvis",
+    "service_user": "jarvis",
+    "service_group": "jarvis",
+    "systemd_enabled": true,
+    "auto_start": true,
+    "working_directory": "/home/jarvis/AI_Intrigation"
+  },
+  "app_intelligence": {
+    "enabled": true,
+    "research_timeout": 10,
+    "search_providers": ["apt", "dnf", "pacman", "zypper", "github"],
+    "auto_install_confirm_timeout": 30,
+    "check_availability": true,
+    "verify_installation": true
+  },
+  "web_portal": {
+    "enabled": true,
+    "host": "0.0.0.0",
+    "port": 5000,
+    "ssl_enabled": false,
+    "username": "admin",
+    "password_hash": ""
+  },
+  "error_handling": {
+    "auto_recovery": true,
+    "max_retries": 3,
+    "retry_delay_seconds": 2,
+    "log_errors": true,
+    "user_friendly_messages": true
+  },
+  "user_preferences": {
+    "notification_enabled": true,
+    "notification_type": "voice",
+    "auto_save_preferences": true,
+    "theme": "auto"
+  }
+}
