@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JARVIS Control Center - Debug Mode</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -12,22 +13,125 @@
         }
 
         :root {
-            --primary: #2196F3;
-            --danger: #f44336;
-            --success: #4CAF50;
-            --warning: #ff9800;
-            --bg-dark: #1a1a1a;
-            --bg-lighter: #2d2d2d;
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0b0;
-            --border-color: #404040;
+            --primary: #00d9ff;
+            --primary-dark: #0099cc;
+            --primary-light: #4deaff;
+            --danger: #ff3366;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --info: #0099ff;
+            --bg-dark: #0a0f1e;
+            --bg-darker: #050811;
+            --bg-card: #13172e;
+            --bg-card-hover: #1a2240;
+            --text-primary: #f0f8ff;
+            --text-secondary: #a0b3d9;
+            --text-muted: #667899;
+            --border-color: #2a3455;
+            --border-light: #3a4465;
+            --gradient-primary: linear-gradient(135deg, #00d9ff 0%, #0066ff 100%);
+            --gradient-dark: linear-gradient(145deg, #0a0f1e 0%, #13172e 100%);
+            --gradient-card: linear-gradient(145deg, #13172e 0%, #1a2240 100%);
+            --shadow-primary: 0 10px 30px rgba(0, 217, 255, 0.15);
+            --shadow-card: 0 8px 25px rgba(0, 10, 30, 0.4);
+            --shadow-hover: 0 15px 35px rgba(0, 217, 255, 0.25);
+            --glass-bg: rgba(19, 23, 46, 0.7);
+            --glass-border: rgba(100, 150, 255, 0.1);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-dark);
+            font-family: 'Segoe UI', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-darker);
             color: var(--text-primary);
             overflow: hidden;
+            min-height: 100vh;
+        }
+
+        /* Animated Background */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .grid-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(to right, rgba(0, 217, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 217, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.3;
+        }
+
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            filter: blur(40px);
+            opacity: 0.1;
+        }
+
+        .shape:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            left: -150px;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .shape:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            top: 20%;
+            right: -100px;
+            animation: float 25s infinite ease-in-out reverse;
+            background: radial-gradient(circle, var(--info) 0%, transparent 70%);
+        }
+
+        .shape:nth-child(3) {
+            width: 400px;
+            height: 400px;
+            bottom: -200px;
+            left: 30%;
+            animation: float 30s infinite ease-in-out;
+            background: radial-gradient(circle, var(--success) 0%, transparent 70%);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(50px, 50px) rotate(90deg); }
+            50% { transform: translate(0, 100px) rotate(180deg); }
+            75% { transform: translate(-50px, 50px) rotate(270deg); }
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, transparent, var(--primary), transparent);
+            animation: scan 4s linear infinite;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
         }
 
         /* ==================== AUTH PAGE ==================== */
@@ -36,157 +140,215 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            position: relative;
         }
 
         .auth-box {
-            background: var(--bg-lighter);
-            border: 2px solid var(--primary);
-            border-radius: 15px;
-            padding: 40px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 50px;
             width: 90%;
-            max-width: 450px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-            animation: slideIn 0.5s ease-out;
+            max-width: 500px;
+            position: relative;
+            z-index: 1;
+            box-shadow: var(--shadow-primary);
+            transform: translateY(0);
+            transition: all 0.4s ease;
+            overflow: hidden;
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .auth-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .auth-box:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
         }
 
         .auth-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
         .auth-header h1 {
-            color: var(--primary);
-            font-size: 28px;
-            margin-bottom: 5px;
+            color: var(--text-primary);
+            font-size: 36px;
+            margin-bottom: 10px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .auth-header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--gradient-primary);
+            border-radius: 2px;
         }
 
         .auth-header p {
             color: var(--text-secondary);
-            font-size: 14px;
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 20px;
         }
 
         .auth-section {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .auth-section label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-size: 14px;
             color: var(--text-secondary);
-            font-weight: 500;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .input-group {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
         .input-group input {
             flex: 1;
-            padding: 12px;
+            padding: 16px 20px;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background: var(--bg-dark);
+            border-radius: 12px;
+            background: rgba(10, 15, 30, 0.8);
             color: var(--text-primary);
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
 
         .input-group input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.2);
         }
 
         .button-group {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 25px;
         }
 
         .btn {
             flex: 1;
-            padding: 12px;
+            padding: 16px 24px;
             border: none;
-            border-radius: 8px;
-            font-size: 14px;
+            border-radius: 12px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
         .btn-primary {
-            background: var(--primary);
+            background: var(--gradient-primary);
             color: white;
         }
 
         .btn-primary:hover {
-            background: #1976D2;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 217, 255, 0.4);
         }
 
         .btn-voice {
-            background: var(--success);
+            background: var(--gradient-primary);
             color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
 
         .btn-voice:hover {
-            background: #45a049;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 217, 255, 0.4);
         }
 
         .btn-voice.listening {
-            animation: pulse 1s infinite;
+            animation: pulse 1.5s infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(0, 217, 255, 0.8);
+            }
         }
 
         .status-message {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 13px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
             display: none;
+            animation: slideDown 0.3s ease;
+            font-weight: 500;
+            border-left: 4px solid transparent;
         }
 
         .status-message.error {
-            background: rgba(244, 67, 54, 0.1);
-            color: #ff6b6b;
-            border: 1px solid rgba(244, 67, 54, 0.3);
+            background: rgba(255, 51, 102, 0.1);
+            color: var(--danger);
+            border-left-color: var(--danger);
             display: block;
         }
 
         .status-message.success {
-            background: rgba(76, 175, 80, 0.1);
-            color: #4CAF50;
-            border: 1px solid rgba(76, 175, 80, 0.3);
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--success);
+            border-left-color: var(--success);
             display: block;
         }
 
         .status-message.info {
-            background: rgba(33, 150, 243, 0.1);
-            color: #2196F3;
-            border: 1px solid rgba(33, 150, 243, 0.3);
+            background: rgba(0, 217, 255, 0.1);
+            color: var(--primary);
+            border-left-color: var(--primary);
             display: block;
         }
 
@@ -194,16 +356,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
-            height: 30px;
+            gap: 6px;
+            height: 40px;
+            margin-top: 15px;
         }
 
         .voice-bar {
-            width: 3px;
+            width: 4px;
             height: 100%;
-            background: var(--success);
-            border-radius: 2px;
-            animation: soundWave 0.5s ease-in-out infinite;
+            background: var(--gradient-primary);
+            border-radius: 3px;
+            animation: soundWave 1s ease-in-out infinite;
         }
 
         .voice-bar:nth-child(1) { animation-delay: 0s; }
@@ -213,8 +376,14 @@
         .voice-bar:nth-child(5) { animation-delay: 0.4s; }
 
         @keyframes soundWave {
-            0%, 100% { height: 10%; }
-            50% { height: 100%; }
+            0%, 100% {
+                height: 20%;
+                opacity: 0.5;
+            }
+            50% {
+                height: 100%;
+                opacity: 1;
+            }
         }
 
         /* ==================== MAIN DASHBOARD ==================== */
@@ -222,93 +391,130 @@
             display: none;
             height: 100vh;
             flex-direction: column;
+            background: var(--bg-dark);
         }
 
         .dashboard.active {
             display: flex;
+            animation: fadeIn 0.5s ease;
         }
 
         .top-bar {
-            background: var(--bg-lighter);
-            border-bottom: 1px solid var(--border-color);
-            padding: 15px 25px;
+            background: rgba(10, 15, 30, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 20px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .top-bar h1 {
-            color: var(--primary);
-            font-size: 24px;
+            color: var(--text-primary);
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .top-bar h1::before {
+            content: '';
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
         }
 
         .top-bar-right {
             display: flex;
-            gap: 15px;
+            gap: 20px;
             align-items: center;
         }
 
         .status-badge {
-            background: var(--success);
+            background: var(--gradient-primary);
             color: white;
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
         }
 
         .logout-btn {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
+            background: rgba(255, 51, 102, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            padding: 10px 20px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
+            transition: all 0.3s ease;
         }
 
         .logout-btn:hover {
-            background: #d32f2f;
+            background: var(--danger);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 51, 102, 0.3);
         }
 
         .content {
             flex: 1;
             overflow-y: auto;
-            padding: 25px;
+            padding: 30px;
         }
 
         .tab-container {
             display: flex;
             gap: 10px;
-            margin-bottom: 25px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0;
+            margin-bottom: 30px;
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 8px;
+            width: fit-content;
+            border: 1px solid var(--border-color);
         }
 
         .tab-btn {
-            background: none;
+            background: transparent;
             border: none;
             color: var(--text-secondary);
-            padding: 15px 20px;
+            padding: 14px 24px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
-            border-bottom: 3px solid transparent;
+            border-radius: 12px;
             transition: all 0.3s ease;
-        }
-
-        .tab-btn.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
         }
 
         .tab-btn:hover {
             color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 5px 20px rgba(0, 217, 255, 0.3);
         }
 
         .tab-content {
             display: none;
+            animation: slideUp 0.4s ease;
         }
 
         .tab-content.active {
@@ -317,31 +523,48 @@
 
         .settings-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
         }
 
         .setting-card {
-            background: var(--bg-lighter);
+            background: var(--gradient-card);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 20px;
+            border-radius: 20px;
+            padding: 25px;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .setting-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
         }
 
         .setting-card:hover {
+            transform: translateY(-5px);
             border-color: var(--primary);
-            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.1);
+            box-shadow: var(--shadow-hover);
         }
 
         .setting-card h3 {
-            margin-bottom: 15px;
-            color: var(--primary);
-            font-size: 16px;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .setting-item {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .setting-item:last-child {
@@ -350,8 +573,8 @@
 
         .setting-label {
             display: block;
-            margin-bottom: 8px;
-            font-size: 12px;
+            margin-bottom: 10px;
+            font-size: 13px;
             color: var(--text-secondary);
             font-weight: 600;
             text-transform: uppercase;
@@ -360,31 +583,36 @@
 
         select, input[type="text"], input[type="number"], input[type="password"] {
             width: 100%;
-            padding: 10px;
+            padding: 14px 18px;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background: var(--bg-dark);
+            border-radius: 12px;
+            background: rgba(10, 15, 30, 0.8);
             color: var(--text-primary);
-            font-size: 13px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
 
         select:focus, input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.2);
         }
 
+        /* FIXED TOGGLE SWITCH */
         .toggle-switch {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
+            padding: 5px 0;
         }
 
         .switch {
             position: relative;
             display: inline-block;
-            width: 50px;
-            height: 24px;
+            width: 54px;
+            height: 28px;
+            flex-shrink: 0;
         }
 
         .switch input {
@@ -400,204 +628,308 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: var(--text-secondary);
+            background-color: var(--border-color);
             transition: 0.4s;
-            border-radius: 24px;
+            border-radius: 34px;
         }
 
         .slider:before {
             position: absolute;
             content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
             background-color: white;
             transition: 0.4s;
             border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         input:checked + .slider {
-            background-color: var(--success);
+            background: var(--gradient-primary);
         }
 
         input:checked + .slider:before {
             transform: translateX(26px);
         }
 
+        .toggle-switch span {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
         .button-row {
             display: flex;
-            gap: 10px;
-            margin-top: 15px;
+            gap: 12px;
+            margin-top: 20px;
         }
 
         .btn-save {
             flex: 1;
-            padding: 10px;
-            background: var(--success);
+            padding: 14px;
+            background: var(--gradient-primary);
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 12px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .btn-save:hover {
-            background: #45a049;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 217, 255, 0.4);
         }
 
         .btn-reset {
             flex: 1;
-            padding: 10px;
-            background: var(--warning);
-            color: white;
-            border: none;
-            border-radius: 6px;
+            padding: 14px;
+            background: rgba(255, 170, 0, 0.2);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+            border-radius: 12px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 14px;
+            transition: all 0.3s ease;
         }
 
         .btn-reset:hover {
-            background: #e68900;
+            background: var(--warning);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 170, 0, 0.4);
         }
 
         .info-box {
-            background: rgba(33, 150, 243, 0.1);
+            background: rgba(0, 217, 255, 0.1);
             border-left: 4px solid var(--primary);
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            line-height: 1.5;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-primary);
         }
 
         .feature-list {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
 
         .feature-item {
-            background: var(--bg-lighter);
+            background: var(--gradient-card);
             border: 1px solid var(--border-color);
-            padding: 15px;
-            border-radius: 8px;
+            padding: 20px;
+            border-radius: 15px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-hover);
         }
 
         .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 20px;
+            color: white;
+            flex-shrink: 0;
         }
 
         .feature-info h4 {
-            margin-bottom: 3px;
-            font-size: 13px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 600;
         }
 
         .feature-info p {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-secondary);
-        }
-
-        .code-block {
-            background: var(--bg-dark);
-            border: 1px solid var(--border-color);
-            padding: 15px;
-            border-radius: 6px;
-            overflow-x: auto;
-            margin: 10px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
             line-height: 1.5;
         }
 
+        .code-block {
+            background: rgba(10, 15, 30, 0.8);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--success);
+            position: relative;
+        }
+
+        .code-block::before {
+            content: 'Terminal';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: var(--bg-card);
+            padding: 0 10px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
         .success-animation {
-            animation: successPulse 0.5s ease-out;
+            animation: successPulse 0.6s ease-out;
         }
 
         @keyframes successPulse {
             0% {
                 transform: scale(1);
-                opacity: 1;
+                box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7);
             }
             50% {
                 transform: scale(1.05);
             }
             100% {
                 transform: scale(1);
-                opacity: 1;
+                box-shadow: 0 0 0 10px rgba(0, 255, 136, 0);
             }
         }
 
         /* Scrollbar styling */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 10px;
+            height: 10px;
         }
 
         ::-webkit-scrollbar-track {
-            background: var(--bg-lighter);
+            background: var(--bg-card);
+            border-radius: 10px;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 4px;
+            background: var(--gradient-primary);
+            border-radius: 10px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
+            background: var(--primary-dark);
         }
 
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid var(--border-color);
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 10px;
-            vertical-align: middle;
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-container {
+                overflow-x: auto;
+                white-space: nowrap;
+                width: 100%;
+                padding: 10px;
+            }
+
+            .tab-btn {
+                padding: 12px 20px;
+                font-size: 13px;
+            }
+
+            .auth-box {
+                padding: 30px;
+            }
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* Animation classes */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .glow {
+            text-shadow: 0 0 10px currentColor;
         }
     </style>
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="background-animation">
+        <div class="grid-lines"></div>
+        <div class="floating-shapes">
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+        </div>
+        <div class="scan-line"></div>
+    </div>
+
     <!-- ==================== AUTH PAGE ==================== -->
     <div id="authPage" class="auth-container">
         <div class="auth-box">
             <div class="auth-header">
-                <h1>🔐 JARVIS Debug Mode</h1>
+                <h1><i class="fas fa-robot"></i> JARVIS Debug Mode</h1>
                 <p>Voice Verification Required</p>
             </div>
 
             <div id="authStatus" class="status-message"></div>
 
             <div class="auth-section">
-                <label>Method 1: Keyword Entry</label>
+                <label><i class="fas fa-key"></i> Method 1: Keyword Entry</label>
                 <div class="input-group">
-                    <input 
-                        type="password" 
-                        id="debugKeyword" 
+                    <input
+                        type="password"
+                        id="debugKeyword"
                         placeholder="Enter: debugmode code 0"
                         autocomplete="off"
                     >
-                    <button class="btn btn-primary" onclick="verifyDebugKeyword()">Verify</button>
+                    <button class="btn btn-primary" onclick="verifyDebugKeyword()">
+                        <i class="fas fa-check"></i> Verify
+                    </button>
                 </div>
             </div>
 
             <div class="auth-section">
-                <label>Method 2: Voice Verification</label>
+                <label><i class="fas fa-microphone"></i> Method 2: Voice Verification</label>
                 <div class="button-group">
                     <button class="btn btn-voice" id="voiceBtn" onclick="startVoiceAuth()">
-                        <span id="voiceText">🎤 Listen</span>
+                        <i class="fas fa-microphone"></i>
+                        <span id="voiceText">Listen for Command</span>
                     </button>
                 </div>
                 <div id="voiceWave" class="voice-wave" style="display: none;">
@@ -610,7 +942,7 @@
             </div>
 
             <div class="info-box" style="margin-top: 30px;">
-                <strong>🔒 Security Notice:</strong> This control panel requires authentication. Say "debugmode code 0" or enter the keyword to access system settings.
+                <strong><i class="fas fa-shield-alt"></i> Security Notice:</strong> This control panel requires authentication. Say "debugmode code 0" or enter the keyword to access system settings.
             </div>
         </div>
     </div>
@@ -619,29 +951,39 @@
     <div id="dashboard" class="dashboard">
         <div class="top-bar">
             <div>
-                <h1>⚙️ JARVIS Control Center</h1>
+                <h1><i class="fas fa-cogs"></i> JARVIS Control Center</h1>
             </div>
             <div class="top-bar-right">
-                <span class="status-badge" id="statusBadge">🟢 Online</span>
-                <button class="logout-btn" onclick="logout()">Logout</button>
+                <span class="status-badge" id="statusBadge"><i class="fas fa-circle"></i> Online</span>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
         </div>
 
         <div class="content">
             <!-- Tabs -->
             <div class="tab-container">
-                <button class="tab-btn active" onclick="switchTab('ai-settings')">🤖 AI Settings</button>
-                <button class="tab-btn" onclick="switchTab('response-settings')">💬 Response Types</button>
-                <button class="tab-btn" onclick="switchTab('security-settings')">🔐 Security</button>
-                <button class="tab-btn" onclick="switchTab('features')">✨ Features</button>
-                <button class="tab-btn" onclick="switchTab('advanced')">⚙️ Advanced</button>
+                <button class="tab-btn active" onclick="switchTab('ai-settings')">
+                    <i class="fas fa-robot"></i> AI Settings
+                </button>
+                <button class="tab-btn" onclick="switchTab('response-settings')">
+                    <i class="fas fa-comment-alt"></i> Response Types
+                </button>
+                <button class="tab-btn" onclick="switchTab('security-settings')">
+                    <i class="fas fa-shield-alt"></i> Security
+                </button>
+                <button class="tab-btn" onclick="switchTab('features')">
+                    <i class="fas fa-star"></i> Features
+                </button>
+                <button class="tab-btn" onclick="switchTab('advanced')">
+                    <i class="fas fa-sliders-h"></i> Advanced
+                </button>
             </div>
 
             <!-- AI Settings Tab -->
             <div id="ai-settings" class="tab-content active">
                 <div class="settings-grid">
                     <div class="setting-card">
-                        <h3>🤖 Default AI Provider</h3>
+                        <h3><i class="fas fa-robot"></i> Default AI Provider</h3>
                         <div class="setting-item">
                             <label class="setting-label">Primary Provider</label>
                             <select id="defaultProvider" onchange="updateSetting('default_provider', this.value)">
@@ -664,7 +1006,7 @@
                     </div>
 
                     <div class="setting-card">
-                        <h3>🔄 Provider Mapping</h3>
+                        <h3><i class="fas fa-route"></i> Provider Mapping</h3>
                         <div class="setting-item">
                             <label class="setting-label">Research Tasks</label>
                             <select id="researchProvider" onchange="updateSetting('research_provider', this.value)">
@@ -692,9 +1034,9 @@
                     </div>
 
                     <div class="setting-card">
-                        <h3>🔑 API Keys</h3>
+                        <h3><i class="fas fa-key"></i> API Keys</h3>
                         <div class="info-box">
-                            API keys are stored securely in environment variables. Update them via terminal:
+                            <i class="fas fa-info-circle"></i> API keys are stored securely in environment variables. Update them via terminal:
                             <div class="code-block">
 export OPENAI_API_KEY="your-key"
 export GOOGLE_API_KEY="your-key"
@@ -709,22 +1051,22 @@ export DEEPSEEK_API_KEY="your-key"
             <div id="response-settings" class="tab-content">
                 <div class="settings-grid">
                     <div class="setting-card">
-                        <h3>💬 Response Type</h3>
+                        <h3><i class="fas fa-comment-alt"></i> Response Type</h3>
                         <div class="setting-item">
                             <label class="setting-label">Select Response Format</label>
                             <select id="responseType" onchange="updateSetting('response_type', this.value)">
-                                <option value="detailed">📖 Detailed - Full explanations with context</option>
-                                <option value="concise">⚡ Concise - Short, key points only</option>
-                                <option value="technical">🔬 Technical - Deep specs & details</option>
-                                <option value="simple">🧒 Simple - ELI5 beginner-friendly</option>
-                                <option value="code">💻 Code - Code examples focused</option>
-                                <option value="bullet">📋 Bullet - Key points in bullet format</option>
+                                <option value="detailed"><i class="fas fa-file-alt"></i> Detailed - Full explanations with context</option>
+                                <option value="concise"><i class="fas fa-bolt"></i> Concise - Short, key points only</option>
+                                <option value="technical"><i class="fas fa-flask"></i> Technical - Deep specs & details</option>
+                                <option value="simple"><i class="fas fa-user-graduate"></i> Simple - ELI5 beginner-friendly</option>
+                                <option value="code"><i class="fas fa-code"></i> Code - Code examples focused</option>
+                                <option value="bullet"><i class="fas fa-list"></i> Bullet - Key points in bullet format</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="setting-card">
-                        <h3>📝 Content Options</h3>
+                        <h3><i class="fas fa-cog"></i> Content Options</h3>
                         <div class="setting-item">
                             <label class="setting-label">Include Examples</label>
                             <div class="toggle-switch">
@@ -748,13 +1090,13 @@ export DEEPSEEK_API_KEY="your-key"
                     </div>
 
                     <div class="setting-card">
-                        <h3>🎓 Language Level</h3>
+                        <h3><i class="fas fa-language"></i> Language Level</h3>
                         <div class="setting-item">
                             <label class="setting-label">User Level</label>
                             <select id="languageLevel" onchange="updateSetting('language_level', this.value)">
-                                <option value="beginner">🟢 Beginner - Simple, clear language</option>
-                                <option value="intermediate">🟡 Intermediate - Balanced technical</option>
-                                <option value="advanced">🔴 Advanced - Deep technical knowledge</option>
+                                <option value="beginner"><i class="fas fa-circle" style="color: #00ff88;"></i> Beginner - Simple, clear language</option>
+                                <option value="intermediate"><i class="fas fa-circle" style="color: #ffaa00;"></i> Intermediate - Balanced technical</option>
+                                <option value="advanced"><i class="fas fa-circle" style="color: #ff3366;"></i> Advanced - Deep technical knowledge</option>
                             </select>
                         </div>
                         <div class="setting-item">
@@ -768,10 +1110,10 @@ export DEEPSEEK_API_KEY="your-key"
                     </div>
 
                     <div class="setting-card">
-                        <h3>📊 Response Preview</h3>
-                        <div style="background: var(--bg-dark); padding: 15px; border-radius: 6px; margin-top: 10px;">
-                            <p style="color: var(--text-secondary); font-size: 12px; margin-bottom: 10px;">Current settings preview:</p>
-                            <p id="responsePreview" style="font-size: 13px; line-height: 1.6;">Response preview updates as you change settings...</p>
+                        <h3><i class="fas fa-eye"></i> Response Preview</h3>
+                        <div style="background: rgba(10, 15, 30, 0.8); padding: 20px; border-radius: 12px; margin-top: 10px; border: 1px solid var(--border-color);">
+                            <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 15px; font-weight: 600;"><i class="fas fa-play-circle"></i> Current settings preview:</p>
+                            <p id="responsePreview" style="font-size: 14px; line-height: 1.8; color: var(--text-primary);">Response preview updates as you change settings...</p>
                         </div>
                     </div>
                 </div>
@@ -781,41 +1123,41 @@ export DEEPSEEK_API_KEY="your-key"
             <div id="security-settings" class="tab-content">
                 <div class="settings-grid">
                     <div class="setting-card">
-                        <h3>🔐 Sudo Configuration</h3>
+                        <h3><i class="fas fa-user-secret"></i> Sudo Configuration</h3>
                         <div class="setting-item">
                             <label class="setting-label">Current Sudo Keyword</label>
-                            <input 
-                                type="password" 
-                                id="sudoKeyword" 
+                            <input
+                                type="password"
+                                id="sudoKeyword"
                                 placeholder="sudo code 0"
                                 readonly
                             >
                         </div>
                         <div class="setting-item">
                             <label class="setting-label">Set New Keyword</label>
-                            <input 
-                                type="text" 
-                                id="newSudoKeyword" 
+                            <input
+                                type="text"
+                                id="newSudoKeyword"
                                 placeholder="e.g., unlock the vault"
                             >
                         </div>
-                        <button class="btn-save" onclick="updateSudoKeyword()">Update Keyword</button>
+                        <button class="btn-save" onclick="updateSudoKeyword()"><i class="fas fa-save"></i> Update Keyword</button>
                     </div>
 
                     <div class="setting-card">
-                        <h3>⏱️ Access Duration</h3>
+                        <h3><i class="fas fa-clock"></i> Access Duration</h3>
                         <div class="setting-item">
                             <label class="setting-label">Default Duration (seconds)</label>
-                            <input 
-                                type="number" 
-                                id="sudoDuration" 
+                            <input
+                                type="number"
+                                id="sudoDuration"
                                 value="300"
                                 min="60"
                                 max="3600"
                                 onchange="updateSetting('sudo_duration', this.value)"
                             >
-                            <p style="font-size: 11px; color: var(--text-secondary); margin-top: 5px;">
-                                ℹ️ Default: 300s (5 min) | Max: 3600s (1 hour)
+                            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
+                                <i class="fas fa-info-circle"></i> Default: 300s (5 min) | Max: 3600s (1 hour)
                             </p>
                         </div>
                         <div class="setting-item">
@@ -831,7 +1173,7 @@ export DEEPSEEK_API_KEY="your-key"
                     </div>
 
                     <div class="setting-card">
-                        <h3>🚫 Dangerous Commands</h3>
+                        <h3><i class="fas fa-ban"></i> Dangerous Commands</h3>
                         <div class="setting-item">
                             <label class="setting-label">Command Blocking</label>
                             <div class="toggle-switch">
@@ -855,7 +1197,7 @@ export DEEPSEEK_API_KEY="your-key"
                     </div>
 
                     <div class="setting-card">
-                        <h3>🔒 Voice Biometrics</h3>
+                        <h3><i class="fas fa-microphone-alt"></i> Voice Biometrics</h3>
                         <div class="setting-item">
                             <label class="setting-label">Voice Verification</label>
                             <div class="toggle-switch">
@@ -869,12 +1211,20 @@ export DEEPSEEK_API_KEY="your-key"
                     </div>
 
                     <div class="setting-card">
-                        <h3>📋 Sudo Examples</h3>
-                        <div style="font-size: 12px; line-height: 1.8;">
-                            <p><strong>Default:</strong> "sudo code 0" → 5 minutes</p>
-                            <p><strong>Timed:</strong> "sudo code 300" → 5 min</p>
-                            <p><strong>Timed:</strong> "sudo code 1800" → 30 min</p>
-                            <p><strong>Custom:</strong> "unlock the vault" → custom keyword</p>
+                        <h3><i class="fas fa-list-ol"></i> Sudo Examples</h3>
+                        <div style="font-size: 13px; line-height: 1.8; color: var(--text-primary);">
+                            <p style="margin-bottom: 10px; padding: 12px; background: rgba(10, 15, 30, 0.8); border-radius: 8px; border-left: 3px solid var(--success);">
+                                <strong><i class="fas fa-key"></i> Default:</strong> "sudo code 0" → 5 minutes
+                            </p>
+                            <p style="margin-bottom: 10px; padding: 12px; background: rgba(10, 15, 30, 0.8); border-radius: 8px; border-left: 3px solid var(--warning);">
+                                <strong><i class="fas fa-clock"></i> Timed:</strong> "sudo code 300" → 5 min
+                            </p>
+                            <p style="margin-bottom: 10px; padding: 12px; background: rgba(10, 15, 30, 0.8); border-radius: 8px; border-left: 3px solid var(--primary);">
+                                <strong><i class="fas fa-hourglass-half"></i> Timed:</strong> "sudo code 1800" → 30 min
+                            </p>
+                            <p style="padding: 12px; background: rgba(10, 15, 30, 0.8); border-radius: 8px; border-left: 3px solid var(--info);">
+                                <strong><i class="fas fa-magic"></i> Custom:</strong> "unlock the vault" → custom keyword
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -883,16 +1233,16 @@ export DEEPSEEK_API_KEY="your-key"
             <!-- Features Tab -->
             <div id="features" class="tab-content">
                 <div class="info-box">
-                    <strong>🎯 Intelligent Features:</strong> JARVIS now includes advanced AI-powered features for better automation and control.
+                    <strong><i class="fas fa-bolt"></i> Intelligent Features:</strong> JARVIS now includes advanced AI-powered features for better automation and control.
                 </div>
 
                 <div class="feature-list">
                     <div class="feature-item">
-                        <div class="feature-icon">🔍</div>
+                        <div class="feature-icon"><i class="fas fa-search"></i></div>
                         <div class="feature-info">
                             <h4>App Intelligence</h4>
                             <p>Research & install apps automatically</p>
-                            <div class="toggle-switch" style="margin-top: 8px;">
+                            <div class="toggle-switch" style="margin-top: 10px;">
                                 <label class="switch">
                                     <input type="checkbox" id="appIntel" onchange="updateSetting('app_intelligence', this.checked)" checked>
                                     <span class="slider"></span>
@@ -902,11 +1252,11 @@ export DEEPSEEK_API_KEY="your-key"
                     </div>
 
                     <div class="feature-item">
-                        <div class="feature-icon">🧠</div>
+                        <div class="feature-icon"><i class="fas fa-brain"></i></div>
                         <div class="feature-info">
                             <h4>Smart Routing</h4>
                             <p>Auto-select best AI provider per task</p>
-                            <div class="toggle-switch" style="margin-top: 8px;">
+                            <div class="toggle-switch" style="margin-top: 10px;">
                                 <label class="switch">
                                     <input type="checkbox" id="smartRoute" onchange="updateSetting('smart_routing', this.checked)" checked>
                                     <span class="slider"></span>
@@ -916,11 +1266,11 @@ export DEEPSEEK_API_KEY="your-key"
                     </div>
 
                     <div class="feature-item">
-                        <div class="feature-icon">💬</div>
+                        <div class="feature-icon"><i class="fas fa-comments"></i></div>
                         <div class="feature-info">
                             <h4>Response Customization</h4>
                             <p>6 different response types available</p>
-                            <div class="toggle-switch" style="margin-top: 8px;">
+                            <div class="toggle-switch" style="margin-top: 10px;">
                                 <label class="switch">
                                     <input type="checkbox" id="respCustom" onchange="updateSetting('response_customization', this.checked)" checked>
                                     <span class="slider"></span>
@@ -930,11 +1280,11 @@ export DEEPSEEK_API_KEY="your-key"
                     </div>
 
                     <div class="feature-item">
-                        <div class="feature-icon">🔐</div>
+                        <div class="feature-icon"><i class="fas fa-user-lock"></i></div>
                         <div class="feature-info">
                             <h4>Custom Sudo Keywords</h4>
                             <p>Fully customizable security phrases</p>
-                            <div class="toggle-switch" style="margin-top: 8px;">
+                            <div class="toggle-switch" style="margin-top: 10px;">
                                 <label class="switch">
                                     <input type="checkbox" id="customSudo" onchange="updateSetting('custom_sudo', this.checked)" checked>
                                     <span class="slider"></span>
@@ -944,11 +1294,11 @@ export DEEPSEEK_API_KEY="your-key"
                     </div>
 
                     <div class="feature-item">
-                        <div class="feature-icon">🎤</div>
+                        <div class="feature-icon"><i class="fas fa-microphone"></i></div>
                         <div class="feature-info">
                             <h4>Voice Commands</h4>
                             <p>Full voice control with wake word</p>
-                            <div class="toggle-switch" style="margin-top: 8px;">
+                            <div class="toggle-switch" style="margin-top: 10px;">
                                 <label class="switch">
                                     <input type="checkbox" id="voiceCmd" onchange="updateSetting('voice_commands', this.checked)" checked>
                                     <span class="slider"></span>
@@ -958,11 +1308,11 @@ export DEEPSEEK_API_KEY="your-key"
                     </div>
 
                     <div class="feature-item">
-                        <div class="feature-icon">📊</div>
+                        <div class="feature-icon"><i class="fas fa-history"></i></div>
                         <div class="feature-info">
                             <h4>Conversation History</h4>
                             <p>Store and recall past interactions</p>
-                            <div class="toggle-switch" style="margin-top: 8px;">
+                            <div class="toggle-switch" style="margin-top: 10px;">
                                 <label class="switch">
                                     <input type="checkbox" id="history" onchange="updateSetting('conversation_history', this.checked)" checked>
                                     <span class="slider"></span>
@@ -977,9 +1327,9 @@ export DEEPSEEK_API_KEY="your-key"
             <div id="advanced" class="tab-content">
                 <div class="settings-grid">
                     <div class="setting-card">
-                        <h3>⚙️ System Configuration</h3>
+                        <h3><i class="fas fa-cogs"></i> System Configuration</h3>
                         <div class="info-box">
-                            These are advanced settings. Modify with caution.
+                            <i class="fas fa-exclamation-triangle"></i> These are advanced settings. Modify with caution.
                         </div>
                         <div class="setting-item">
                             <label class="setting-label">Logging Level</label>
@@ -1003,41 +1353,41 @@ export DEEPSEEK_API_KEY="your-key"
                     </div>
 
                     <div class="setting-card">
-                        <h3>📁 Data Management</h3>
+                        <h3><i class="fas fa-database"></i> Data Management</h3>
                         <div class="setting-item">
-                            <button class="btn-save" onclick="exportSettings()">📥 Export Settings</button>
+                            <button class="btn-save" onclick="exportSettings()"><i class="fas fa-download"></i> Export Settings</button>
                         </div>
                         <div class="setting-item">
-                            <button class="btn-save" onclick="document.getElementById('importFile').click()">📤 Import Settings</button>
+                            <button class="btn-save" onclick="document.getElementById('importFile').click()"><i class="fas fa-upload"></i> Import Settings</button>
                             <input type="file" id="importFile" style="display:none;" accept=".json" onchange="importSettings(event)">
                         </div>
                         <div class="setting-item">
-                            <button class="btn-reset" onclick="resetDefaults()">🔄 Reset to Defaults</button>
+                            <button class="btn-reset" onclick="resetDefaults()"><i class="fas fa-redo"></i> Reset to Defaults</button>
                         </div>
                     </div>
 
                     <div class="setting-card">
-                        <h3>🔐 Debug Mode Access</h3>
+                        <h3><i class="fas fa-terminal"></i> Debug Mode Access</h3>
                         <div class="info-box">
-                            <strong>Current Keyword:</strong>
+                            <strong><i class="fas fa-key"></i> Current Keyword:</strong>
                             <div class="code-block" style="margin-top: 10px;">
 debugmode code 0
                             </div>
-                            <p style="margin-top: 10px;">Say this phrase or enter in password field to access this control panel.</p>
+                            <p style="margin-top: 10px; color: var(--text-secondary);"><i class="fas fa-info-circle"></i> Say this phrase or enter in password field to access this control panel.</p>
                         </div>
                     </div>
 
                     <div class="setting-card">
-                        <h3>📊 System Status</h3>
+                        <h3><i class="fas fa-chart-line"></i> System Status</h3>
                         <div class="setting-item">
                             <label class="setting-label">JARVIS Status</label>
-                            <p style="padding: 10px; background: var(--bg-dark); border-radius: 6px; border-left: 3px solid var(--success);">
-                                🟢 Running | Version 2.0.0 | All systems operational
+                            <p style="padding: 15px; background: rgba(10, 15, 30, 0.8); border-radius: 10px; border-left: 4px solid var(--success); color: var(--text-primary); font-weight: 500;">
+                                <i class="fas fa-circle" style="color: var(--success);"></i> Running | Version 2.0.0 | All systems operational
                             </p>
                         </div>
                         <div class="setting-item">
                             <label class="setting-label">Last Updated</label>
-                            <p id="lastUpdate" style="color: var(--text-secondary); font-size: 12px;">Never</p>
+                            <p id="lastUpdate" style="color: var(--text-secondary); font-size: 13px; padding: 10px; background: rgba(10, 15, 30, 0.8); border-radius: 8px;"><i class="fas fa-clock"></i> Never</p>
                         </div>
                     </div>
                 </div>
@@ -1046,7 +1396,7 @@ debugmode code 0
     </div>
 
     <script>
-        // ==================== AUTHENTICATION ==================== 
+        // ==================== AUTHENTICATION ====================
         const CORRECT_KEYWORD = "debugmode code 0";
         let isAuthenticated = false;
 
@@ -1114,7 +1464,7 @@ debugmode code 0
             }
         }
 
-        // ==================== TAB SWITCHING ==================== 
+        // ==================== TAB SWITCHING ====================
         function switchTab(tabName) {
             // Hide all tabs
             const tabs = document.querySelectorAll('.tab-content');
@@ -1131,7 +1481,7 @@ debugmode code 0
             event.target.classList.add('active');
         }
 
-        // ==================== SETTINGS ==================== 
+        // ==================== SETTINGS ====================
         let settings = {
             default_provider: 'gemini',
             smart_routing: true,
@@ -1187,7 +1537,7 @@ debugmode code 0
 
             // Show success animation
             event.target.classList.add('success-animation');
-            setTimeout(() => event.target.classList.remove('success-animation'), 500);
+            setTimeout(() => event.target.classList.remove('success-animation'), 600);
         }
 
         function updateSudoKeyword() {
